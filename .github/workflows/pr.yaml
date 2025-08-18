@@ -1,0 +1,11 @@
+name: PR manila-data
+
+on:
+  pull_request:
+    paths:
+      - 'manila_data/**'
+      - 'tests/**'
+
+jobs:
+  test:
+    uses: ./.github/workflows/test.yml
