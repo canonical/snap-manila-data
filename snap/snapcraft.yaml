@@ -1,0 +1,79 @@
+name: manila-data
+base: core24
+version: "2025.1"
+summary: manila-data in a snap
+description: |
+  Manila is the OpenStack project that provides shared filesystems as a
+  service for instances. This snap provides the manila-data service.
+
+confinement: strict
+
+package-repositories:
+  - type: apt
+    cloud: epoxy
+    priority: always
+    pocket: proposed
+
+environment:
+  PYTHONPATH: $SNAP/lib/python3.12:$SNAP/lib/python3.12/site-packages:$SNAP/lib/python3.12/dist-packages:$PYTHONPATH
+
+layout:
+  /etc/manila:
+    bind: $SNAP_DATA/conf
+  /var/log/manila:
+    bind: $SNAP_COMMON/logs
+
+apps:
+  manila-data:
+    environment:
+      # Standard library components must have priority in module name resolution: https://storyboard.openstack.org/#!/story/2007806
+      PYTHONPATH: $PYTHONPATH:$SNAP/usr/lib/python3.12:$SNAP/usr/lib/python3.12/site-packages:$SNAP/usr/lib/python3/dist-packages:$SNAP/lib/python3.12:$SNAP/lib/python3.12/site-packages
+    command: bin/manila-data
+    daemon: simple
+    plugs:
+      - network
+      - network-bind
+      - mount-observe
+      - nfs-mount
+
+parts:
+  openstack:
+    plugin: nil
+    stage-packages:
+      - manila-data
+      - ceph-common
+    organize:
+      usr/bin/: bin/
+      usr/sbin/: bin/
+      usr/lib/: lib/
+      usr/share/: share/
+    prime:
+      - bin/manila-data
+      - lib/python3
+
+  manila-data:
+    after: [openstack]
+    plugin: python
+    source: .
+    build-packages:
+      - git
+    python-requirements:
+      - requirements.txt
+    override-build: |
+      craftctl default
+      manila-data-snap-helpers write-hooks
+
+  bin:
+    source: bin/
+    plugin: dump
+    organize:
+      "*": usr/bin/
+
+hooks:
+  install:
+    plugs: [network]
+  configure:
+    plugs:
+      - network
+      - network-control
+      - firewall-control
