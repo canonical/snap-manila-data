@@ -5,7 +5,7 @@ description = "OpenStack Manila Data Service Snap"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
-  "snap-helpers @ git+https://github.com/albertodonato/snap-helpers",
+  "snap-helpers @ git+https://github.com/albertodonato/snap-helpers@46803aa9d52cc0bb24f76df878dd1010fc08e6a0",
   "jinja2",
   "pydantic",
 ]
