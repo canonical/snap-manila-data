@@ -4,6 +4,11 @@ version = "0.1.0"
 description = "OpenStack Manila Data Service Snap"
 readme = "README.md"
 requires-python = ">=3.12"
+dependencies = [
+  "snap-helpers @ git+https://github.com/albertodonato/snap-helpers",
+  "jinja2",
+  "pydantic",
+]
 
 [build-system]
 requires = ["setuptools", "setuptools-scm"]

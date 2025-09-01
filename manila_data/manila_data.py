@@ -153,9 +153,6 @@ class ManilaData(typing.Generic[CONF], abc.ABC):
         original_hash = None
         if dest_file.exists():
             original_hash = hash(dest_file.read_text())
-            return False
-
-        logging.debug("File %s has changed, writing new content", dest_file)
 
         tpl = None
         template_file = template.template()
@@ -174,6 +171,9 @@ class ManilaData(typing.Generic[CONF], abc.ABC):
 
         if original_hash == new_hash:
             logging.debug("File %s has not changed, skipping", dest_file)
+            return False
+
+        logging.debug("File %s has changed, writing new content", dest_file)
 
         dest_file.write_text(rendered)
         dest_file.chmod(template.mode)

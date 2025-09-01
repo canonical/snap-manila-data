@@ -8,6 +8,7 @@
 rootwrap_config = {{ snap_paths.common }}/etc/manila/rootwrap.conf
 debug = {{ settings.debug }}
 use_syslog = True
+use_stderr = True
 auth_strategy = keystone
 state_path = {{ snap_paths.common }}/lib/manila
 transport_url = {{ rabbitmq.url }}

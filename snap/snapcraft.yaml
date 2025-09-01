@@ -17,12 +17,6 @@ package-repositories:
 environment:
   PYTHONPATH: $SNAP/lib/python3.12:$SNAP/lib/python3.12/site-packages:$SNAP/lib/python3.12/dist-packages:$PYTHONPATH
 
-layout:
-  /etc/manila:
-    bind: $SNAP_DATA/conf
-  /var/log/manila:
-    bind: $SNAP_COMMON/logs
-
 apps:
   manila-data:
     environment:
