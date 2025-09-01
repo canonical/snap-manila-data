@@ -1,0 +1,28 @@
+[project]
+name = "manila-data"
+version = "0.1.0"
+description = "OpenStack Manila Data Service Snap"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+  "snap-helpers @ git+https://github.com/albertodonato/snap-helpers@46803aa9d52cc0bb24f76df878dd1010fc08e6a0",
+  "jinja2",
+  "pydantic",
+]
+
+[build-system]
+requires = ["setuptools", "setuptools-scm"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+packages = ["manila_data", "manila_data.scripts"]
+
+[tool.setuptools.package-data]
+manila_data = ["templates/*.j2"]
+
+[project.scripts]
+manila-data-snap-helpers = "manila_data.scripts.snap_helpers:script"
+
+[project.entry-points."snaphelpers.hooks"]
+install = "manila_data.manila_data:GenericManilaData.install_hook"
+configure = "manila_data.manila_data:GenericManilaData.configure_hook"
