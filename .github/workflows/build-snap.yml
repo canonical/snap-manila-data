@@ -18,7 +18,7 @@ jobs:
       snap: ${{ steps.snapcraft.outputs.snap }}
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Build snap locally
         uses: canonical/action-build@v1.3.0
