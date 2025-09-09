@@ -1,18 +1,12 @@
 name: manila-data
 base: core24
-version: "2025.1"
+version: "2024.1"
 summary: manila-data in a snap
 description: |
   Manila is the OpenStack project that provides shared filesystems as a
   service for instances. This snap provides the manila-data service.
 
 confinement: strict
-
-package-repositories:
-  - type: apt
-    cloud: epoxy
-    priority: always
-    pocket: proposed
 
 environment:
   PYTHONPATH: $SNAP/lib/python3.12:$SNAP/lib/python3.12/site-packages:$SNAP/lib/python3.12/dist-packages:$PYTHONPATH
