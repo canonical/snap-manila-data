@@ -36,6 +36,11 @@ parts:
     stage-packages:
       - manila-data
       - ceph-common
+    override-build: |
+      craftctl default
+      # purge some dangling symlinks
+      rm -rf $CRAFT_PART_INSTALL/usr/lib/python3/dist-packages/netaddr/eui/iab.txt
+      rm -rf $CRAFT_PART_INSTALL/usr/lib/python3/dist-packages/netaddr/eui/oui.txt
     organize:
       usr/bin/: bin/
       usr/sbin/: bin/
