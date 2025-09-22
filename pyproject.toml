@@ -10,6 +10,22 @@ dependencies = [
   "pydantic",
 ]
 
+[project.optional-dependencies]
+dev = [
+  "stestr",
+  "black",
+  "isort",
+  "flake8",
+  "flake8-docstrings",
+  "flake8-copyright",
+  "flake8-builtins",
+  "pyproject-flake8",
+  "pep8-naming",
+  "codespell",
+  "mypy",
+  "coverage",
+]
+
 [build-system]
 requires = ["setuptools", "setuptools-scm"]
 build-backend = "setuptools.build_meta"
@@ -26,3 +42,16 @@ manila-data-snap-helpers = "manila_data.scripts.snap_helpers:script"
 [project.entry-points."snaphelpers.hooks"]
 install = "manila_data.manila_data:GenericManilaData.install_hook"
 configure = "manila_data.manila_data:GenericManilaData.configure_hook"
+
+[tool.flake8]
+extend-ignore=["E226", "W504"]
+
+[tool.coverage.run]
+branch = true
+parallel = true
+source = ["manila_data"]
+omit = [
+    ".tox/*",
+    "tests/*",
+    "manila_data/templates/*",
+]
