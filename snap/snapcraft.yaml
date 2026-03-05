@@ -1,10 +1,18 @@
 name: manila-data
 base: core24
 version: "2025.1"
-summary: manila-data in a snap
+license: Apache-2.0
+summary: OpenStack Manila data migration and copy service
 description: |
-  Manila is the OpenStack project that provides shared filesystems as a
-  service for instances. This snap provides the manila-data service.
+  Snap package for the manila-data service from OpenStack Manila, the Shared
+  Filesystems service. The manila-data daemon handles data copy and migration
+  operations between shares, such as driver-assisted and host-assisted share
+  migration and creating shares from snapshots that require data copying.
+
+  This snap includes support for Ceph (via ceph-common) and NFS backends.
+  Configuration is managed through snap configuration options (snap set/get)
+  for database connectivity, RabbitMQ messaging, debug mode, and telemetry
+  notifications.
 
 confinement: strict
 
