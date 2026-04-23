@@ -25,6 +25,7 @@ dev = [
   "mypy",
   "coverage",
 ]
+tics = ["pylint", "flake8"]
 
 [build-system]
 requires = ["setuptools", "setuptools-scm"]
