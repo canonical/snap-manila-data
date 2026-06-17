@@ -1,6 +1,5 @@
 name: manila-data
 base: core26
-build-base: devel
 version: "2026.1"
 license: Apache-2.0
 summary: OpenStack Manila data migration and copy service
@@ -16,7 +15,7 @@ description: |
   notifications.
 
 confinement: strict
-grade: devel
+grade: stable
 
 environment:
   PYTHONPATH: $SNAP/lib/python3.14:$SNAP/lib/python3.14/site-packages:$SNAP/lib/python3.14/dist-packages:$PYTHONPATH
