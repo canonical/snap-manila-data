@@ -77,6 +77,8 @@ class TestManilaDataService(unittest.TestCase):
             "debug = False",
             f"state_path = {tmp}/common/lib/manila",
             "transport_url = lish",
+            f"mount_tmp_location = {tmp}/common/mnt/",
+            f"backup_mount_tmp_location = {tmp}/common/mnt/",
             "connection = foo",
             f"lock_path = {tmp}/common/lib/manila/tmp",
         ]
@@ -85,12 +87,13 @@ class TestManilaDataService(unittest.TestCase):
         expected_rootwrap = [
             (
                 f"filters_path={tmp}/common/etc/manila/rootwrap.d,"
-                f"{tmp}/snap/usr/share/manila/rootwrap"
+                f"{tmp}/snap/share/manila-common/rootwrap.d"
             ),
             (
                 f"exec_dirs={tmp}/snap/sbin,{tmp}/snap/usr/sbin,"
                 f"{tmp}/snap/bin,{tmp}/snap/usr/bin,{tmp}/snap/usr/local/bin,"
-                f"{tmp}/snap/usr/local/sbin,{tmp}/snap/usr/lpp/mmfs/bin"
+                f"{tmp}/snap/usr/local/sbin,{tmp}/snap/usr/lpp/mmfs/bin,"
+                "/usr/bin"
             ),
         ]
         self._check_file_contents(rootwrap_path, expected_rootwrap)

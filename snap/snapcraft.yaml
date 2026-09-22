@@ -1,6 +1,6 @@
 name: manila-data
 base: core26
-version: "2026.1"
+version: "2026.2"
 license: Apache-2.0
 summary: OpenStack Manila data migration and copy service
 description: |
@@ -17,8 +17,27 @@ description: |
 confinement: strict
 grade: stable
 
+package-repositories:
+  - type: apt
+    # Hibiscus 2026.2 is only in the UCA -proposed pocket so far.
+    # Switch pocket to updates once it is promoted.
+    cloud: hibiscus
+    pocket: proposed
+    priority: always
+
 environment:
-  PYTHONPATH: $SNAP/lib/python3.14:$SNAP/lib/python3.14/site-packages:$SNAP/lib/python3.14/dist-packages:$PYTHONPATH
+  PYTHONPATH: $SNAP/lib/python3.14:$SNAP/lib/python3.14/site-packages:$SNAP/lib/python3/dist-packages:$PYTHONPATH
+
+layout:
+  # mount(8) only looks for mount.<type> helpers in /sbin (-> /usr/sbin).
+  /usr/sbin/mount.nfs:
+    bind-file: $SNAP/bin/mount.nfs
+  /usr/sbin/mount.nfs4:
+    bind-file: $SNAP/bin/mount.nfs
+  # librados/libcephfs/librbd find libceph-common through a RUNPATH on this
+  # path, and libceph-common loads its compressor/crypto plugins from it.
+  /usr/lib/$CRAFT_ARCH_TRIPLET_BUILD_FOR/ceph:
+    symlink: $SNAP/lib/$CRAFT_ARCH_TRIPLET_BUILD_FOR/ceph
 
 apps:
   manila-data:
@@ -32,6 +51,14 @@ apps:
       - network-bind
       - mount-observe
       - nfs-mount
+      # Fix cotyledon workers spawned via multiprocessing cannot creating POSIX
+      # semaphores at `/dev/shm/sem.*` in strict confinement.
+      - shared-memory
+
+plugs:
+  shared-memory:
+    interface: shared-memory
+    private: true
 
 parts:
   openstack:
@@ -39,6 +66,12 @@ parts:
     stage-packages:
       - manila-data
       - ceph-common
+      # mount(8) inside $SNAP
+      - mount
+      # Provides mount.nfs for host-assisted migration of NFS shares.
+      - nfs-common
+      # Runtime dep of the ceph snappy compressor plugin, not in core26.
+      - libsnappy1v5
     override-build: |
       craftctl default
       # purge some dangling symlinks
@@ -53,7 +86,20 @@ parts:
       usr/share/: share/
     prime:
       - bin/manila-data
+      # Root helper and filters for the commands manila-data runs as root
+      # (mount, umount, ls, stat, cp, ...).
+      - bin/manila-rootwrap
+      - share/manila-common/rootwrap.d
+      # mount(8) and the helpers it runs for host-assisted migration.
+      - bin/mount
+      - bin/mount.nfs*
       - lib/python3
+      # Shared libraries needed by the C extensions in lib/python3.
+      - lib/$CRAFT_ARCH_TRIPLET_BUILD_FOR
+      # Remove libraries for unused ceph-dencoder debug plugins and
+      # OSD block device plugins.
+      - -lib/$CRAFT_ARCH_TRIPLET_BUILD_FOR/ceph/denc
+      - -lib/$CRAFT_ARCH_TRIPLET_BUILD_FOR/ceph/extblkdev
 
   manila-data:
     after: [openstack]
@@ -81,6 +127,9 @@ parts:
       rm -f $CRAFT_PRIME/bin/python
       rm -f $CRAFT_PRIME/bin/python3
       rm -f $CRAFT_PRIME/bin/python3.14
+      # Remove build-time parts requiring uv launchers.
+      rm -f $CRAFT_PRIME/bin/manila-data-snap-helpers
+      rm -f $CRAFT_PRIME/bin/snap-helpers
 
   bin:
     source: bin/
