@@ -18,6 +18,8 @@ This module holds the definition of all configuration options the snap
 takes as input from `snap set`.
 """
 
+import ipaddress
+
 import pydantic
 import pydantic.alias_generators
 
@@ -48,6 +50,20 @@ class RabbitMQConfiguration(ParentConfig):
 class Settings(ParentConfig):
     debug: bool = False
     enable_telemetry_notifications: bool = False
+
+    # Comma-separated IPs of this node granted access to shares for
+    # host-assisted migration (manila data_node_access_ips).
+    data_node_access_ips: str | None = None
+
+    @pydantic.field_validator("data_node_access_ips")
+    @classmethod
+    def _validate_ips(cls, value: str | None) -> str | None:
+        if value is None:
+            return None
+        ips = [ip.strip() for ip in value.split(",") if ip.strip()]
+        for ip in ips:
+            ipaddress.ip_address(ip)
+        return ",".join(ips) or None
 
 
 class Configuration(ParentConfig):

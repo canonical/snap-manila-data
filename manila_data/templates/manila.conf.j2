@@ -15,6 +15,9 @@ transport_url = {{ rabbitmq.url }}
 # The NFS-mount interface only allows mounts under SNAP_DATA/SNAP_COMMON.
 mount_tmp_location = {{ snap_paths.common }}/mnt/
 backup_mount_tmp_location = {{ snap_paths.common }}/mnt/
+{% if settings.data_node_access_ips -%}
+data_node_access_ips = {{ settings.data_node_access_ips }}
+{% endif -%}
 
 [database]
 connection = {{ database.url }}

@@ -78,6 +78,7 @@ All options are set with `snap set manila-data <key>=<value>` and read with
 |---|---|---|
 | `settings.debug` | `false` | Enable debug-level logging |
 | `settings.enable-telemetry-notifications` | `false` | Enable Oslo messaging notifications for telemetry (Ceilometer) |
+| `settings.data-node-access-ips` | unset | Comma-separated `manila-data` own IPs (e.g. `10.0.0.5`) allowed to access the backend. Required for host-assisted NFS share migrations. |
 
 ## Snap Interfaces
 
