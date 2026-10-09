@@ -77,6 +77,8 @@ class TestManilaDataService(unittest.TestCase):
             "debug = False",
             f"state_path = {tmp}/common/lib/manila",
             "transport_url = lish",
+            f"mount_tmp_location = {tmp}/common/mnt/",
+            f"backup_mount_tmp_location = {tmp}/common/mnt/",
             "connection = foo",
             f"lock_path = {tmp}/common/lib/manila/tmp",
         ]
@@ -85,12 +87,13 @@ class TestManilaDataService(unittest.TestCase):
         expected_rootwrap = [
             (
                 f"filters_path={tmp}/common/etc/manila/rootwrap.d,"
-                f"{tmp}/snap/usr/share/manila/rootwrap"
+                f"{tmp}/snap/share/manila-common/rootwrap.d"
             ),
             (
                 f"exec_dirs={tmp}/snap/sbin,{tmp}/snap/usr/sbin,"
                 f"{tmp}/snap/bin,{tmp}/snap/usr/bin,{tmp}/snap/usr/local/bin,"
-                f"{tmp}/snap/usr/local/sbin,{tmp}/snap/usr/lpp/mmfs/bin"
+                f"{tmp}/snap/usr/local/sbin,{tmp}/snap/usr/lpp/mmfs/bin,"
+                "/usr/bin"
             ),
         ]
         self._check_file_contents(rootwrap_path, expected_rootwrap)
@@ -108,3 +111,35 @@ class TestManilaDataService(unittest.TestCase):
         self._check_file_contents(manila_conf_path, expected_manila_conf)
 
         self.manila_service.restart.assert_called_once()
+
+    @mock.patch("manila_data.log.setup_logging", mock.Mock())
+    def test_data_node_access_ips(self):
+        """Tests data_node_access_ips is rendered only when set."""
+        manila_conf_path = self.tmpdir / "common/etc/manila/manila.conf"
+
+        manila_data.GenericManilaData.install_hook(self.snap)
+        self.assertNotIn("data_node_access_ips", manila_conf_path.read_text())
+
+        options = self.snap.config.get_options.return_value.as_dict
+        options.return_value["settings"] = {
+            "data-node-access-ips": "10.0.0.5, 2001:db8::5"
+        }
+        manila_data.GenericManilaData.install_hook(self.snap)
+        self._check_file_contents(
+            manila_conf_path, ["data_node_access_ips = 10.0.0.5,2001:db8::5"]
+        )
+
+    @mock.patch("manila_data.log.setup_logging", mock.Mock())
+    def test_configure_hook_invalid_config(self):
+        """Tests invalid config keeps the existing files untouched."""
+        manila_data.GenericManilaData.install_hook(self.snap)
+        manila_conf_path = self.tmpdir / "common/etc/manila/manila.conf"
+        original = manila_conf_path.read_text()
+
+        options = self.snap.config.get_options.return_value.as_dict
+        options.return_value["settings"] = {"data-node-access-ips": "foo"}
+        manila_data.GenericManilaData.configure_hook(self.snap)
+
+        self.assertEqual(manila_conf_path.read_text(), original)
+        self.manila_service.start.assert_called_once()
+        self.manila_service.restart.assert_not_called()
