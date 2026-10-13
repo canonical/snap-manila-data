@@ -18,7 +18,7 @@ confinement: strict
 grade: stable
 
 environment:
-  PYTHONPATH: $SNAP/lib/python3.14:$SNAP/lib/python3.14/site-packages:$SNAP/lib/python3.14/dist-packages:$PYTHONPATH
+  PYTHONPATH: $SNAP/lib/python3.14:$SNAP/lib/python3.14/site-packages:$SNAP/lib/python3/dist-packages:$PYTHONPATH
 
 apps:
   manila-data:
