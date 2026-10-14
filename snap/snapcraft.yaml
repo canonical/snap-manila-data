@@ -17,7 +17,7 @@ description: |
 confinement: strict
 
 environment:
-  PYTHONPATH: $SNAP/lib/python3.12:$SNAP/lib/python3.12/site-packages:$SNAP/lib/python3.12/dist-packages:$PYTHONPATH
+  PYTHONPATH: $SNAP/lib/python3.12:$SNAP/lib/python3.12/site-packages:$SNAP/lib/python3/dist-packages:$PYTHONPATH
 
 apps:
   manila-data:
